@@ -84,7 +84,7 @@ const VirtualMeetingRoom: React.FC<VirtualMeetingRoomProps> = ({ user, meeting, 
                 </div>
                 <div>
                   <h3 className="text-2xl md:text-4xl font-bold text-white mb-2">{meeting.teacherName}</h3>
-                  <p className="text-slate-400 font-medium">Head Instructor - Christaville School</p>
+                  <p className="text-slate-400 font-medium">Head Instructor - MORAVIA online Education</p>
                 </div>
               </div>
             )}

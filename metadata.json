@@ -1,6 +1,6 @@
 {
-  "name": "Christaville School Learning Portal",
-  "description": "A professional educational platform for Christaville School featuring interactive CBT exams, AI tutoring, and curriculum exploration for Nursery, Primary, and Junior Secondary levels.",
+  "name": "MORAVIA online Education Learning Portal",
+  "description": "A professional educational platform for MORAVIA online Education featuring interactive CBT exams, AI tutoring, and curriculum exploration for Nursery, Primary, and Junior Secondary levels.",
   "requestFramePermissions": [
     "microphone",
     "geolocation"

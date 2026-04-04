@@ -22,7 +22,7 @@ export class GeminiService {
       model: 'gemini-3-flash-preview',
       contents: contents,
       config: {
-        systemInstruction: `You are a friendly, encouraging AI tutor for Christaville School. 
+        systemInstruction: `You are a friendly, encouraging AI tutor for MORAVIA online Education. 
         The current student level is ${level}. 
         Keep explanations simple for Nursery/Grade students and more detailed for Junior Secondary. 
         Encourage critical thinking and offer hints before giving the full answer.`,

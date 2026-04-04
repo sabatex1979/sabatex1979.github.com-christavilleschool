@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
+import Chatbot from './components/Chatbot';
 import Hero from './components/Hero';
 import HomeSlider from './components/HomeSlider';
 import MapSearch from './components/MapSearch';
@@ -14,61 +16,111 @@ import LoginPage from './components/LoginPage';
 import AdminDashboard from './components/AdminDashboard';
 import ContactUs from './components/ContactUs';
 import Footer from './components/Footer';
-import { SUBJECTS, INITIAL_SCHOOL_CONFIG, TESTIMONIALS as INITIAL_TESTIMONIALS, SLIDES as INITIAL_SLIDES, MOCK_MEETINGS } from './constants';
-import { Subject, SchoolLevel, User, UserRole, SchoolConfig, Meeting, ExamResult, AttendanceRecord, Testimonial } from './types';
+import ELibrary from './components/ELibrary';
+import LearningMaterialsPortal from './components/LearningMaterialsPortal';
+import HomeworkPortal from './components/HomeworkPortal';
+import OfflineCBT from './components/OfflineCBT';
+import SchoolRegistration from './components/SchoolRegistration';
+import RegistrationOptions from './components/RegistrationOptions';
+import { SUBJECTS, INITIAL_SCHOOL_CONFIG, TESTIMONIALS as INITIAL_TESTIMONIALS, SLIDES as INITIAL_SLIDES, MOCK_MEETINGS, LIBRARY_RESOURCES } from './constants';
+import { Subject, SchoolLevel, User, UserRole, SchoolConfig, Meeting, ExamResult, AttendanceRecord, Testimonial, TaskType } from './types';
+
+const AccessPending = () => (
+  <div className="pt-32 pb-20 px-4 text-center">
+    <h2 className="text-4xl font-black text-slate-900 mb-6 uppercase tracking-tighter">Access Pending</h2>
+    <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Your account is currently awaiting administrative approval. Please check back later.</p>
+  </div>
+);
 
 const App: React.FC = () => {
+  // Load initial state from localStorage if available
+  const [user, setUser] = useState<User | null>(() => {
+    const saved = localStorage.getItem('cv_user');
+    return saved ? JSON.parse(saved) : null;
+  });
+  
+  const isAuthorized = user?.role === UserRole.ADMIN || user?.isAuthorized;
+  
   const [currentPage, setCurrentPage] = useState('home');
-  const [user, setUser] = useState<User | null>(null);
-  const [allUsers, setAllUsers] = useState<User[]>([]); 
+  const [allUsers, setAllUsers] = useState<User[]>(() => {
+    const saved = localStorage.getItem('cv_all_users');
+    return saved ? JSON.parse(saved) : [];
+  });
+  
   const [subjects, setSubjects] = useState<Subject[]>(SUBJECTS);
   const [config, setConfig] = useState<SchoolConfig>(INITIAL_SCHOOL_CONFIG);
   const [slides, setSlides] = useState(INITIAL_SLIDES);
   const [testimonials, setTestimonials] = useState<Testimonial[]>(INITIAL_TESTIMONIALS);
   const [meetings, setMeetings] = useState<Meeting[]>(MOCK_MEETINGS);
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
-  const [filterLevel, setFilterLevel] = useState<SchoolLevel | 'all'>('all');
+  const [activeTaskType, setActiveTaskType] = useState<TaskType>(TaskType.EXAM);
   const [activeMeeting, setActiveMeeting] = useState<Meeting | null>(null);
-  const [results, setResults] = useState<ExamResult[]>([]);
-  const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
+  
+  const [results, setResults] = useState<ExamResult[]>(() => {
+    const saved = localStorage.getItem('cv_results');
+    return saved ? JSON.parse(saved) : [];
+  });
+  
+  const [attendance, setAttendance] = useState<AttendanceRecord[]>(() => {
+    const saved = localStorage.getItem('cv_attendance');
+    return saved ? JSON.parse(saved) : [];
+  });
+  
   const [viewingResult, setViewingResult] = useState<ExamResult | null>(null);
 
+  // Sync state to localStorage
   useEffect(() => {
-    if (user) {
-      setAllUsers(prev => {
-        const index = prev.findIndex(u => u.username === user.username);
-        if (index === -1) return [...prev, user];
-        const newUsers = [...prev];
-        newUsers[index] = user;
-        return newUsers;
-      });
-    }
+    localStorage.setItem('cv_user', JSON.stringify(user));
   }, [user]);
 
-  const handleUpdateUser = (updatedUser: User) => {
-    setAllUsers(prev => prev.map(u => u.username === updatedUser.username ? updatedUser : u));
-    if (user?.username === updatedUser.username) {
-      setUser(updatedUser);
-    }
+  useEffect(() => {
+    localStorage.setItem('cv_all_users', JSON.stringify(allUsers));
+  }, [allUsers]);
+
+  useEffect(() => {
+    localStorage.setItem('cv_results', JSON.stringify(results));
+  }, [results]);
+
+  useEffect(() => {
+    localStorage.setItem('cv_attendance', JSON.stringify(attendance));
+  }, [attendance]);
+
+  const getStudentLevel = (className?: string): SchoolLevel | null => {
+    if (!className) return null;
+    const lower = className.toLowerCase();
+    if (lower.includes('nursery')) return SchoolLevel.NURSERY;
+    if (lower.includes('grade')) return SchoolLevel.GRADE;
+    if (lower.includes('jss') || lower.includes('junior')) return SchoolLevel.JUNIOR_SECONDARY;
+    if (lower.includes('ss') || lower.includes('senior')) return SchoolLevel.SENIOR_SECONDARY;
+    return null;
   };
 
-  const handleStartExam = (subject: Subject) => {
+  const getUserSubjects = () => {
+    if (user?.role === UserRole.ADMIN || user?.role === UserRole.TEACHER) return subjects;
+    const level = getStudentLevel(user?.studentClass);
+    return level ? subjects.filter(s => s.level === level) : [];
+  };
+
+  const filteredSubjects = getUserSubjects();
+
+  const handleStartExam = (subject: Subject, type: TaskType = TaskType.EXAM) => {
     setSelectedSubject(subject);
-    setCurrentPage('exam');
+    setActiveTaskType(type);
+    setCurrentPage('exam-portal');
   };
 
-  const handleJoinMeeting = (meeting: Meeting) => {
-    if (!user) {
-      setCurrentPage('login');
-      return;
+  const handleLogin = (u: User, isRegistration: boolean = false) => {
+    setUser(u);
+    setAllUsers(prev => {
+      if (prev.find(existing => existing.username === u.username)) return prev;
+      return [...prev, u];
+    });
+    
+    if (isRegistration && u.role !== UserRole.ADMIN) {
+      setCurrentPage('fees');
+    } else {
+      setCurrentPage(u.role === UserRole.ADMIN ? 'admin' : 'materials');
     }
-
-    if (meeting.id === 'zoom-taofeek' || meeting.meetingId === '378 965 7653') {
-      window.open('https://us05web.zoom.us/j/3789657653?pwd=YTRiaCXvUwZSeBv6xj7n65i0OwiBXf.1&omn=81232763063', '_blank');
-      return;
-    }
-    setActiveMeeting(meeting);
-    setCurrentPage('classroom');
   };
 
   const handleLogout = () => {
@@ -78,17 +130,14 @@ const App: React.FC = () => {
     setViewingResult(null);
   };
 
-  const handleSaveResult = (result: ExamResult) => {
-    setResults(prev => [result, ...prev]);
+  const navigateToFeature = (page: string) => {
+    if (!user) {
+      setCurrentPage('login');
+    } else {
+      setCurrentPage(page);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  const handleMarkAttendance = (newRecords: AttendanceRecord[]) => {
-    setAttendance(prev => [...newRecords, ...prev]);
-  };
-
-  const filteredSubjects = filterLevel === 'all' 
-    ? subjects 
-    : subjects.filter(s => s.level === filterLevel);
 
   return (
     <div className="min-h-screen flex flex-col selection:bg-amber-100 selection:text-amber-900">
@@ -111,49 +160,234 @@ const App: React.FC = () => {
             <Hero 
               title={config.heroTitle} 
               subtitle={config.heroSubtitle} 
-              onStart={() => setCurrentPage('cbt')} 
+              onStart={() => setCurrentPage(user ? 'materials' : 'login')} 
             />
+            
+            {/* Learning Ecosystem Feature Grid */}
+            <section className="py-24 px-4 relative overflow-hidden">
+              <div className="max-w-7xl mx-auto">
+                <div className="text-center mb-16">
+                  <h2 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 uppercase tracking-tighter">Learning Ecosystem</h2>
+                  <p className="text-slate-500 font-bold uppercase tracking-widest text-sm max-w-2xl mx-auto">
+                    Integrated digital portals designed to streamline the academic experience for MORAVIA students.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {[
+                    { id: 'library', title: 'E-Library', desc: 'Access 10,000+ digital books and academic journals.', icon: '📖', color: 'colorful-card-grade' },
+                    { id: 'virtual', title: 'Virtual Classroom', desc: 'Join live interactive Zoom sessions and workshops.', icon: '🎥', color: 'colorful-card-secondary' },
+                    { id: 'cbt', title: 'CBT Examination', desc: 'Secure computer-based termly assessments.', icon: '💻', color: 'colorful-card-nursery' },
+                    { id: 'homework', title: 'Homework & Tests', desc: 'Submit daily assignments and weekly quizzes.', icon: '📝', color: 'colorful-card-grade' },
+                    { id: 'attendance', title: 'Live Attendance', desc: 'Real-time presence tracking and reporting.', icon: '⏱️', color: 'colorful-card-secondary' },
+                    { id: 'results', title: 'Results Portal', desc: 'Instant access to performance slips and transcripts.', icon: '📊', color: 'colorful-card-nursery' }
+                  ].map((feature) => (
+                    <button 
+                      key={feature.id}
+                      onClick={() => navigateToFeature(feature.id)}
+                      className={`group p-10 rounded-[3rem] border-2 border-white shadow-xl hover:shadow-2xl transition-all hover:-translate-y-3 text-left backdrop-blur-xl ${feature.color}`}
+                    >
+                      <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-4xl mb-8 shadow-inner group-hover:scale-110 transition-transform">
+                        {feature.icon}
+                      </div>
+                      <h3 className="text-2xl font-black text-slate-900 mb-3 uppercase tracking-tight">{feature.title}</h3>
+                      <p className="text-slate-600 font-medium leading-relaxed mb-8">{feature.desc}</p>
+                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-900 group-hover:gap-4 transition-all">
+                        Access Portal <span className="text-lg">→</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </section>
+
             <HomeSlider slides={slides} />
             <MapSearch />
-            
-            {!user && (
-               <section className="py-24 bg-slate-900/90 backdrop-blur-md overflow-hidden relative">
-                 <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-                    <h2 className="text-4xl font-black text-white mb-6 uppercase tracking-widest">Management Portal</h2>
-                    <p className="text-slate-400 mb-10 font-medium text-lg">Internal access for verified staff and administrators of Christaville School.</p>
-                    <button 
-                      onClick={() => setCurrentPage('login')}
-                      className="px-14 py-6 bg-white text-slate-900 rounded-[2.5rem] font-black uppercase tracking-widest hover:bg-amber-500 hover:text-white transition-all shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:-translate-y-1"
-                    >
-                      Administrator Login
-                    </button>
-                 </div>
-                 <div className="absolute top-0 right-0 p-12 text-white/5 font-black text-[12rem] pointer-events-none select-none">ADMIN</div>
-               </section>
-            )}
 
-            <section className="py-24 relative overflow-hidden">
+            <section className="py-32 relative overflow-hidden">
               <div className="max-w-7xl mx-auto px-4 text-center">
-                <h2 className="text-4xl font-black text-slate-900 mb-12 uppercase tracking-tighter">Curriculum Pathways</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                  <div className="p-16 rounded-[4rem] glass-effect border-2 border-white/50 text-left hover:bg-slate-900 transition-all duration-700 hover:shadow-2xl group cursor-default">
-                    <div className="text-6xl mb-8 group-hover:scale-110 transition-transform">🇬🇧</div>
-                    <h3 className="text-3xl font-black text-slate-900 mb-6 group-hover:text-white transition-colors">British (Cambridge)</h3>
-                    <p className="text-slate-600 group-hover:text-slate-400 leading-relaxed font-medium text-lg">Global critical academic skills mastery. Excellence recognized worldwide.</p>
+                <h2 className="text-5xl font-black text-slate-900 mb-16 uppercase tracking-tighter">Curriculum Pathways</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="p-12 rounded-[3rem] bg-gradient-to-br from-indigo-50/80 to-blue-100/40 backdrop-blur-xl border-2 border-white text-left hover:scale-[1.02] transition-all duration-700 hover:shadow-2xl group cursor-default shadow-lg">
+                    <div className="text-6xl mb-8 group-hover:rotate-12 transition-transform duration-500">🇬🇧</div>
+                    <h3 className="text-3xl font-black text-slate-900 mb-4 group-hover:text-indigo-600 transition-colors">British (Cambridge)</h3>
+                    <p className="text-slate-600 leading-relaxed font-medium text-lg">Global academic mastery. We foster critical thinkers recognized by top institutions worldwide.</p>
                   </div>
-                  <div className="p-16 rounded-[4rem] glass-effect border-2 border-white/50 text-left hover:bg-amber-600 transition-all duration-700 hover:shadow-2xl group cursor-default">
-                    <div className="text-6xl mb-8 group-hover:scale-110 transition-transform">🇺🇸</div>
-                    <h3 className="text-3xl font-black text-slate-900 mb-6 group-hover:text-white transition-colors">American (Common Core)</h3>
-                    <p className="text-slate-600 group-hover:text-amber-50 leading-relaxed font-medium text-lg">Creativity and holistic SAT preparation. Building versatile leaders.</p>
+                  <div className="p-12 rounded-[3rem] bg-gradient-to-br from-emerald-50/80 to-green-100/40 backdrop-blur-xl border-2 border-white text-left hover:scale-[1.02] transition-all duration-700 hover:shadow-2xl group cursor-default shadow-lg">
+                    <div className="text-6xl mb-8 group-hover:rotate-12 transition-transform duration-500">🇳🇬</div>
+                    <h3 className="text-3xl font-black text-slate-900 mb-4 group-hover:text-emerald-600 transition-colors">Nigerian (NERDC)</h3>
+                    <p className="text-slate-600 leading-relaxed font-medium text-lg">Rich cultural heritage meets academic rigor. Full preparation for Entrance Exams, BECE (JUNIOR WAEC), WAEC, NECO, and JAMB excellence.</p>
+                  </div>
+                  <div className="p-12 rounded-[3rem] bg-gradient-to-br from-amber-50/80 to-orange-100/40 backdrop-blur-xl border-2 border-white text-left hover:scale-[1.02] transition-all duration-700 hover:shadow-2xl group cursor-default shadow-lg">
+                    <div className="text-6xl mb-8 group-hover:-rotate-12 transition-transform duration-500">🇺🇸</div>
+                    <h3 className="text-3xl font-black text-slate-900 mb-4 group-hover:text-amber-600 transition-colors">American (Common Core)</h3>
+                    <p className="text-slate-600 leading-relaxed font-medium text-lg">Creativity meets rigor. Holistic SAT preparation and leadership development.</p>
                   </div>
                 </div>
               </div>
             </section>
+
+            {!user && <RegistrationOptions onNavigate={navigateToFeature} />}
+
+            <section className="py-32 bg-slate-50">
+              <div className="max-w-7xl mx-auto px-4">
+                <h2 className="text-5xl font-black text-slate-900 mb-16 text-center uppercase tracking-tighter">Voices of MORAVIA</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {testimonials.map((t) => (
+                    <div key={t.id} className="bg-white p-10 rounded-[2rem] shadow-sm border border-slate-100">
+                      <div className="flex items-center gap-4 mb-6">
+                        <img src={t.avatar} alt={t.name} className="w-16 h-16 rounded-full" />
+                        <div>
+                          <h4 className="font-black text-slate-900">{t.name}</h4>
+                          <p className="text-xs font-bold text-amber-600 uppercase tracking-widest">{t.role}</p>
+                        </div>
+                      </div>
+                      <p className="text-slate-600 font-medium leading-relaxed italic">"{t.content}"</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {!user && (
+              <section className="py-32 bg-slate-900 overflow-hidden relative">
+                <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+                  <h2 className="text-5xl font-black text-white mb-6 uppercase tracking-widest">Internal Portal</h2>
+                  <p className="text-slate-400 mb-12 font-medium text-lg">Official access for authorized MORAVIA staff and administrators.</p>
+                  <button 
+                    onClick={() => setCurrentPage('login')}
+                    className="px-16 py-7 bg-white text-slate-900 rounded-[2.5rem] font-black uppercase tracking-widest hover:bg-amber-500 hover:text-white transition-all shadow-[0_30px_60px_rgba(0,0,0,0.5)] hover:-translate-y-2 active:translate-y-0"
+                  >
+                    Administrator Login
+                  </button>
+                </div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] border-[40px] border-white/5 rounded-full pointer-events-none"></div>
+                <div className="absolute top-0 right-0 p-12 text-white/5 font-black text-[15rem] pointer-events-none select-none">ADMIN</div>
+              </section>
+            )}
+          </div>
+        )}
+
+        {currentPage === 'library' && user && (isAuthorized ? <ELibrary resources={LIBRARY_RESOURCES} userLevel={getStudentLevel(user.studentClass)} /> : <AccessPending />)}
+        {currentPage === 'materials' && user && (isAuthorized ? <LearningMaterialsPortal subjects={filteredSubjects} /> : <AccessPending />)}
+        {currentPage === 'homework' && user && (isAuthorized ? <HomeworkPortal subjects={filteredSubjects} onStartTask={(s, t) => handleStartExam(s, t)} /> : <AccessPending />)}
+        {currentPage === 'virtual' && user && (isAuthorized ? <VirtualClassroom user={user} meetings={meetings} onJoinMeeting={(m) => {setActiveMeeting(m); setCurrentPage('classroom');}} /> : <AccessPending />)}
+        
+        {currentPage === 'cbt' && user && (isAuthorized ? (
+          <div className="pt-24 pb-20 px-4 max-w-7xl mx-auto animate-in slide-in-from-bottom-4">
+             <div className="mb-16 text-center">
+              <h2 className="text-6xl font-black text-slate-900 mb-6 uppercase tracking-tighter">Official Examination Center</h2>
+              <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">
+                Synchronized Termly Assessments for {user.studentClass || 'Authorized Students'}
+              </p>
+            </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+              {filteredSubjects.map((sub) => (
+                <div key={sub.id} className="p-10 rounded-[3rem] border-2 bg-white/60 backdrop-blur-xl hover:-translate-y-3 transition-all group shadow-sm hover:shadow-2xl">
+                  <div className="text-6xl mb-8 group-hover:scale-125 transition-transform origin-left">{sub.icon}</div>
+                  <h3 className="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight">{sub.name}</h3>
+                  <p className="text-xs font-bold text-slate-400 mb-8 uppercase tracking-widest">{sub.questions.length} Questions • Official Exam</p>
+                  <button onClick={() => handleStartExam(sub, TaskType.EXAM)} className="w-full py-5 bg-slate-900 text-white rounded-[2rem] font-black uppercase tracking-widest hover:bg-amber-600 transition-all shadow-xl text-[10px]">Entrance Official</button>
+                </div>
+              ))}
+              {filteredSubjects.length === 0 && (
+                <div className="col-span-full py-20 text-center glass-effect rounded-[3rem]">
+                  <p className="text-slate-400 font-bold uppercase tracking-widest">No subjects currently assigned to your class.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : <AccessPending />)}
+
+        {currentPage === 'classroom' && activeMeeting && user && (
+          <VirtualMeetingRoom user={user} meeting={activeMeeting} onExit={() => {setActiveMeeting(null); setCurrentPage('virtual');}} />
+        )}
+
+        {currentPage === 'exam-portal' && selectedSubject && user && (
+           <div className="pt-24 pb-20 px-4">
+             <CBTEngine 
+                subject={selectedSubject} 
+                user={user} 
+                taskType={activeTaskType}
+                onExit={() => setCurrentPage(activeTaskType === TaskType.EXAM ? 'cbt' : 'homework')} 
+                onSaveResult={(r) => setResults(prev => [r, ...prev])} 
+              />
+           </div>
+        )}
+
+        {currentPage === 'results' && user && (isAuthorized ? <ResultsPage user={user} results={results} onViewResult={(res) => setViewingResult(res)} /> : <AccessPending />)}
+        {currentPage === 'attendance' && user && (isAuthorized ? <AttendancePage user={user} records={attendance} onMarkAttendance={(recs) => setAttendance(prev => [...recs, ...prev])} /> : <AccessPending />)}
+        {currentPage === 'tutor' && user && <div className="pt-24 pb-20 px-4"><AIAssistant /></div>}
+        {currentPage === 'login' && !user && <LoginPage onLogin={handleLogin} />}
+        {currentPage === 'register' && !user && <LoginPage initialMode="register" onLogin={handleLogin} />}
+        {currentPage === 'contact' && <div className="pt-24 pb-20"><ContactUs config={config} /></div>}
+        {currentPage === 'offline-cbt' && <OfflineCBT />}
+        {currentPage === 'school-reg' && <SchoolRegistration />}
+        
+        {currentPage === 'fees' && (
+          <div className="pt-32 pb-20 px-4 max-w-5xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-6xl font-black text-slate-900 mb-6 uppercase tracking-tighter">School Fees Portal</h2>
+              <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Official termly payment instructions and verification</p>
+            </div>
+            
+            <div className="glass-effect p-12 rounded-[4rem] border-4 border-white shadow-2xl bg-gradient-to-br from-amber-50 to-orange-100">
+              <div className="flex flex-col md:flex-row items-center gap-12">
+                <div className="flex-1">
+                  <h3 className="text-4xl font-black text-slate-900 mb-6 uppercase tracking-tighter">Payment Details</h3>
+                  <p className="text-slate-700 font-medium text-lg mb-8 leading-relaxed">
+                    To complete your registration or termly payments, please use the following bank details. 
+                    Ensure you send your payment receipt to the designated email address for verification.
+                  </p>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <span className="w-32 text-xs font-black text-slate-500 uppercase tracking-widest">Amount:</span>
+                      <span className="text-xl font-black text-slate-900">{config.feesAmount} per term/semester</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="w-32 text-xs font-black text-slate-500 uppercase tracking-widest">Bank:</span>
+                      <span className="text-xl font-black text-slate-900">{config.feesBank}</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="w-32 text-xs font-black text-slate-500 uppercase tracking-widest">Account Type:</span>
+                      <span className="text-xl font-black text-slate-900">{config.feesAccountType}</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="w-32 text-xs font-black text-slate-500 uppercase tracking-widest">Account No:</span>
+                      <span className="text-xl font-black text-slate-900 tracking-widest">{config.feesAccountNumber}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex-1 bg-white/60 backdrop-blur-md p-10 rounded-[3rem] border-2 border-white shadow-inner">
+                  <div className="text-center">
+                    <div className="text-6xl mb-6">📧</div>
+                    <h4 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-4">Send Receipt To</h4>
+                    <p className="text-2xl font-black text-amber-600 break-all">{config.feesReceiptEmail}</p>
+                    <p className="mt-6 text-slate-500 font-bold text-sm uppercase tracking-widest">
+                      Please include student name and class in the email subject for instant confirmation.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {currentPage === 'about' && (
+          <div className="pt-32 pb-20 px-4 max-w-5xl mx-auto">
+            <h2 className="text-6xl font-black text-slate-900 mb-12 uppercase tracking-tighter">The MORAVIA Legacy</h2>
+            <div className="glass-effect p-16 rounded-[4rem] text-left space-y-10 shadow-2xl border-[10px] border-white/50">
+              <p className="text-2xl text-slate-700 leading-relaxed font-medium italic">"{config.aboutText}"</p>
+              <div className="h-[30rem] w-full rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white relative group">
+                <img src="https://images.unsplash.com/photo-1523050853063-bd80e27433fb?auto=format&fit=crop&q=80&w=1200" alt="Graduation" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent"></div>
+              </div>
+            </div>
           </div>
         )}
 
         {currentPage === 'admin' && user?.role === UserRole.ADMIN && (
-          <div className="pt-24 pb-20 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="pt-24 pb-20 px-4">
             <AdminDashboard 
               subjects={subjects} 
               setSubjects={setSubjects} 
@@ -168,68 +402,15 @@ const App: React.FC = () => {
               users={allUsers}
               meetings={meetings}
               setMeetings={setMeetings}
-              onUpdateUser={handleUpdateUser}
+              onUpdateUser={(u) => setAllUsers(prev => prev.map(usr => usr.username === u.username ? u : usr))} 
             />
-          </div>
-        )}
-
-        {currentPage === 'virtual' && user && (
-          <div className="pt-24 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <VirtualClassroom user={user} meetings={meetings} onJoinMeeting={handleJoinMeeting} />
-          </div>
-        )}
-
-        {currentPage === 'login' && !user && <LoginPage onLogin={(u) => {setUser(u); setCurrentPage(u.role === UserRole.ADMIN ? 'admin' : 'home');}} />}
-        {currentPage === 'register' && !user && <LoginPage initialMode="register" onLogin={(u) => {setUser(u); setCurrentPage('home');}} />}
-        
-        {currentPage === 'cbt' && user && (
-          <div className="pt-24 pb-20 px-4 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-             <div className="mb-12 text-center">
-              <h2 className="text-5xl font-black text-slate-900 mb-4 tracking-tighter uppercase">Assessment Portal</h2>
-              <div className="flex flex-wrap justify-center gap-2">
-                {['all', ...Object.values(SchoolLevel)].map((lvl) => (
-                  <button key={lvl} onClick={() => setFilterLevel(lvl as any)} className={`px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${filterLevel === lvl ? 'bg-slate-900 text-white shadow-xl scale-105' : 'bg-white/50 backdrop-blur-sm border text-slate-500 hover:bg-slate-100 shadow-sm'}`}>
-                    {lvl}
-                  </button>
-                ))}
-              </div>
-            </div>
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {filteredSubjects.map((sub) => (
-                <div key={sub.id} className="glass-effect p-8 rounded-[2.5rem] border shadow-sm hover:shadow-2xl transition-all flex flex-col group border-white/50 hover:-translate-y-2">
-                  <div className="text-5xl mb-6 group-hover:scale-125 transition-transform origin-left">{sub.icon}</div>
-                  <h3 className="text-xl font-black text-slate-900 mb-1 uppercase tracking-tight">{sub.name}</h3>
-                  <p className="text-xs text-slate-500 font-bold mb-6">{sub.questions.length} Questions</p>
-                  <button onClick={() => handleStartExam(sub)} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg text-xs mt-auto">Start Exam</button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {currentPage === 'exam' && selectedSubject && user && <div className="pt-24 pb-20 px-4 animate-in zoom-in-95 duration-500"><CBTEngine subject={selectedSubject} user={user} onExit={() => {setCurrentPage('cbt'); setSelectedSubject(null);}} onSaveResult={handleSaveResult} /></div>}
-        {currentPage === 'results' && user && <ResultsPage user={user} results={results} onViewResult={(res) => setViewingResult(res)} />}
-        {currentPage === 'attendance' && user && <AttendancePage user={user} records={attendance} onMarkAttendance={handleMarkAttendance} />}
-        {currentPage === 'tutor' && user && <div className="pt-24 pb-20 px-4"><AIAssistant /></div>}
-        {currentPage === 'contact' && <div className="pt-24 pb-20"><ContactUs config={config} /></div>}
-        
-        {currentPage === 'about' && (
-          <div className="pt-32 pb-20 px-4 max-w-4xl mx-auto text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h2 className="text-5xl font-black text-slate-900 mb-10 tracking-tighter uppercase">The Christaville Legacy</h2>
-            <div className="glass-effect p-12 rounded-[3.5rem] text-left space-y-8 shadow-2xl border-4 border-white">
-              <p className="text-xl text-slate-600 leading-relaxed font-medium italic">"{config.aboutText}"</p>
-              <div className="h-80 w-full rounded-2xl overflow-hidden shadow-inner bg-slate-100 relative group">
-                <img src="https://images.unsplash.com/photo-1523050853063-bd80e27433fb?auto=format&fit=crop&q=80&w=1200" alt="Graduation" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors"></div>
-              </div>
-            </div>
           </div>
         )}
       </main>
 
       {viewingResult && <ResultSlip result={viewingResult} config={config} onClose={() => setViewingResult(null)} />}
-      {activeMeeting && user && <VirtualMeetingRoom user={user} meeting={activeMeeting} onExit={() => {setActiveMeeting(null); setCurrentPage('virtual');}} />}
       <Footer config={config} />
+      <Chatbot />
     </div>
   );
 };

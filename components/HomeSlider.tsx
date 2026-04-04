@@ -30,7 +30,7 @@ const HomeSlider: React.FC<HomeSliderProps> = ({ slides }) => {
     <section className="py-20 bg-slate-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-black text-slate-900 mb-4 uppercase tracking-tighter">Life at Christaville</h2>
+          <h2 className="text-3xl font-black text-slate-900 mb-4 uppercase tracking-tighter">Life at MORAVIA</h2>
           <p className="text-slate-600 max-w-2xl mx-auto font-medium">Take a glimpse into our vibrant school environment and world-class facilities.</p>
         </div>
 

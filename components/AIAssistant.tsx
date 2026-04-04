@@ -5,7 +5,7 @@ import { Message, SchoolLevel } from '../types';
 
 const AIAssistant: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', content: "Hello! I'm Christaville's AI Tutor. I can help you with your subjects, explain tricky topics, or even practice questions with you. What would you like to learn today?" }
+    { role: 'model', content: "Hello! I'm MORAVIA's AI Tutor. I can help you with your subjects, explain tricky topics, or even practice questions with you. What would you like to learn today?" }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +44,7 @@ const AIAssistant: React.FC = () => {
         <div className="flex items-center">
           <div className="w-8 h-8 bg-amber-500 rounded-full mr-3 animate-pulse"></div>
           <div>
-            <h3 className="font-bold">Christaville AI Tutor</h3>
+            <h3 className="font-bold">MORAVIA AI Tutor</h3>
             <p className="text-xs text-slate-400">Online & Ready to Help</p>
           </div>
         </div>

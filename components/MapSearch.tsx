@@ -40,7 +40,7 @@ const MapSearch: React.FC = () => {
       <div className="glass-effect p-8 md:p-12 rounded-[3.5rem] border-4 border-white shadow-2xl overflow-hidden relative">
         <div className="relative z-10 text-center mb-10">
           <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-4">Center & Location Finder</h2>
-          <p className="text-slate-600 font-medium">Search for schools, exam centers, or Christaville branches near you.</p>
+          <p className="text-slate-600 font-medium">Search for schools, exam centers, or MORAVIA branches near you.</p>
         </div>
 
         <form onSubmit={handleSearch} className="relative z-10 flex flex-col md:flex-row gap-3 mb-10">

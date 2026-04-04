@@ -13,11 +13,11 @@ const Footer: React.FC<FooterProps> = ({ config }) => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center mb-6">
-              <div className="h-10 w-10 bg-amber-500 rounded-lg flex items-center justify-center font-bold text-white mr-3">C</div>
-              <span className="text-2xl font-black tracking-tighter uppercase">{config?.schoolName || 'Christaville School'}</span>
+              <div className="h-10 w-10 bg-amber-500 rounded-lg flex items-center justify-center font-bold text-white mr-3">M</div>
+              <span className="text-2xl font-black tracking-tighter uppercase">{config?.schoolName || 'MORAVIA online Education'}</span>
             </div>
             <p className="text-slate-400 max-w-sm font-medium leading-relaxed">
-              Providing top-tier educational foundations for children in a safe, inspiring environment since 1998. Committed to academic excellence and moral uprightness.
+              Providing top-tier educational foundations for children in a safe, inspiring environment. Committed to academic excellence and moral uprightness.
             </p>
           </div>
           <div>
@@ -34,21 +34,21 @@ const Footer: React.FC<FooterProps> = ({ config }) => {
             <ul className="space-y-3 text-slate-400 font-bold text-sm">
               <li className="flex items-start gap-3">
                 <span className="text-white">📧</span>
-                <span>{config?.email || 'info@christaville.edu'}</span>
+                <span>{config?.email || 'DS.D188034@rws.com'}</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-white">📞</span>
-                <span>{config?.phone || '+234 800 000 0000'}</span>
+                <span>{config?.phone || '+2348038316472, +2349138570035'}</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-white">📍</span>
-                <span>{config?.address || 'Lagos, Nigeria'}</span>
+                <span>{config?.address || '76A Woji Road Rumurolu Town Port Harcourt Rivers State Nigeria'}</span>
               </li>
             </ul>
           </div>
         </div>
         <div className="pt-8 border-t border-slate-800 text-center text-slate-500 text-[10px] font-black uppercase tracking-[0.4em]">
-          &copy; {new Date().getFullYear()} {config?.schoolName || 'Christaville School'}. All Rights Reserved.
+          &copy; {new Date().getFullYear()} {config?.schoolName || 'MORAVIA online Education'}. All Rights Reserved.
         </div>
       </div>
     </footer>
