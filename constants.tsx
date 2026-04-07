@@ -11,13 +11,30 @@ const generateMaterials = (subjectName: string, topics: string[]): LearningMater
   }));
 };
 
+const SUBJECT_TOPICS: Record<string, string[]> = {
+  'Literacy': ['Phonics', 'Vocabulary', 'Sentence Structure', 'Reading Comprehension'],
+  'Numeracy': ['Addition', 'Subtraction', 'Number Patterns', 'Shapes'],
+  'Arts': ['Colors', 'Drawing Techniques', 'Art History', 'Creative Expression'],
+  'Mathematics': ['Algebra', 'Geometry', 'Arithmetic', 'Statistics', 'Calculus', 'Trigonometry'],
+  'English': ['Grammar', 'Comprehension', 'Vocabulary', 'Essay Writing', 'Literature Analysis'],
+  'Science': ['Biology', 'Chemistry', 'Physics', 'Environmental Science'],
+  'Social Studies': ['History', 'Geography', 'Civics', 'Culture'],
+  'ICT': ['Hardware', 'Software', 'Networking', 'Programming Basics'],
+  'Business': ['Accounting', 'Marketing', 'Management', 'Economics'],
+  'Physics': ['Mechanics', 'Thermodynamics', 'Electromagnetism', 'Optics'],
+  'Chemistry': ['Organic Chemistry', 'Inorganic Chemistry', 'Physical Chemistry', 'Analytical Chemistry'],
+  'Biology': ['Cell Biology', 'Genetics', 'Physiology', 'Ecology']
+};
+
 const generateTaskQuestions = (subjectName: string, type: TaskType, count: number = 10): Question[] => {
   const q: Question[] = [];
+  const topics = SUBJECT_TOPICS[subjectName] || ['General Knowledge'];
   for (let i = 1; i <= count; i++) {
+    const topic = topics[i % topics.length];
     q.push({
       id: `${subjectName}-${type}-${i}`,
-      text: `${type} Question ${i}: Which of the following best describes the fundamental principle of ${subjectName} discussed in week ${i % 5 + 1}?`,
-      options: ['The Absolute Theory', 'The Practical Framework', 'The Analytical Approach', 'The Systematic Method'],
+      text: `${type} Question ${i}: Regarding ${topic}, which of the following statements is most accurate?`,
+      options: [`Option A for ${topic}`, `Option B for ${topic}`, `Option C for ${topic}`, `Option D for ${topic}`],
       correctAnswer: i % 4,
       taskType: type
     });
@@ -27,11 +44,13 @@ const generateTaskQuestions = (subjectName: string, type: TaskType, count: numbe
 
 const generateAcademicQuestions = (subjectName: string, level: SchoolLevel, count: number = 20): Question[] => {
   const result: Question[] = [];
+  const topics = SUBJECT_TOPICS[subjectName] || ['General Knowledge'];
   for (let i = 1; i <= count; i++) {
+    const topic = topics[i % topics.length];
     result.push({
       id: `${level}-${subjectName}-Exam-${i}`,
-      text: `Official Exam Question ${i} for ${subjectName}. Identify the primary objective of the lesson on ${subjectName} covered during the mid-term session.`,
-      options: ['Option Alpha', 'Option Beta', 'Option Gamma', 'Option Delta'],
+      text: `Exam Question ${i} for ${subjectName} (${level}): Which principle best applies to the study of ${topic}?`,
+      options: [`Principle of ${topic} A`, `Principle of ${topic} B`, `Principle of ${topic} C`, `Principle of ${topic} D`],
       correctAnswer: (i % 4),
       taskType: TaskType.EXAM
     });

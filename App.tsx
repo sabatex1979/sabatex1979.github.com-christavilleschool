@@ -227,7 +227,7 @@ const App: React.FC = () => {
               </div>
             </section>
 
-            {!user && <RegistrationOptions onNavigate={navigateToFeature} />}
+            <RegistrationOptions onNavigate={navigateToFeature} />
 
             <section className="py-32 bg-slate-50">
               <div className="max-w-7xl mx-auto px-4">
@@ -249,22 +249,20 @@ const App: React.FC = () => {
               </div>
             </section>
 
-            {!user && (
-              <section className="py-32 bg-slate-900 overflow-hidden relative">
-                <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-                  <h2 className="text-5xl font-black text-white mb-6 uppercase tracking-widest">Internal Portal</h2>
-                  <p className="text-slate-400 mb-12 font-medium text-lg">Official access for authorized MORAVIA staff and administrators.</p>
-                  <button 
-                    onClick={() => setCurrentPage('login')}
-                    className="px-16 py-7 bg-white text-slate-900 rounded-[2.5rem] font-black uppercase tracking-widest hover:bg-amber-500 hover:text-white transition-all shadow-[0_30px_60px_rgba(0,0,0,0.5)] hover:-translate-y-2 active:translate-y-0"
-                  >
-                    Administrator Login
-                  </button>
-                </div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] border-[40px] border-white/5 rounded-full pointer-events-none"></div>
-                <div className="absolute top-0 right-0 p-12 text-white/5 font-black text-[15rem] pointer-events-none select-none">ADMIN</div>
-              </section>
-            )}
+            <section className="py-32 bg-slate-900 overflow-hidden relative">
+              <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+                <h2 className="text-5xl font-black text-white mb-6 uppercase tracking-widest">Internal Portal</h2>
+                <p className="text-slate-400 mb-12 font-medium text-lg">Official access for authorized MORAVIA staff and administrators.</p>
+                <button 
+                  onClick={() => setCurrentPage('login')}
+                  className="px-16 py-7 bg-white text-slate-900 rounded-[2.5rem] font-black uppercase tracking-widest hover:bg-amber-500 hover:text-white transition-all shadow-[0_30px_60px_rgba(0,0,0,0.5)] hover:-translate-y-2 active:translate-y-0"
+                >
+                  Administrator Login
+                </button>
+              </div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] border-[40px] border-white/5 rounded-full pointer-events-none"></div>
+              <div className="absolute top-0 right-0 p-12 text-white/5 font-black text-[15rem] pointer-events-none select-none">ADMIN</div>
+            </section>
           </div>
         )}
 

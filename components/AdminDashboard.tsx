@@ -36,7 +36,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onUpdateUser 
 }) => {
   const [activeTab, setActiveTab] = useState<'results' | 'cbt' | 'virtual' | 'content' | 'users'>('results');
-  const [contentSubTab, setContentSubTab] = useState<'global' | 'slider' | 'testimonials' | 'contact'>('global');
+  const [contentSubTab, setContentSubTab] = useState<'global' | 'slider' | 'testimonials' | 'contact' | 'materials' | 'subjects'>('global');
   const [editingResult, setEditingResult] = useState<ExamResult | null>(null);
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
   const [newMeeting, setNewMeeting] = useState<Partial<Meeting>>({ title: '', teacherName: '', startTime: '', duration: '', status: 'live' });
@@ -290,11 +290,69 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {[
               { id: 'global', label: 'Branding' },
               { id: 'contact', label: 'Contact Us' },
-              { id: 'slider', label: 'Home Slider' }
+              { id: 'slider', label: 'Home Slider' },
+              { id: 'testimonials', label: 'Testimonials' },
+              { id: 'materials', label: 'Materials' },
+              { id: 'subjects', label: 'Subjects' }
             ].map(sub => (
               <button key={sub.id} onClick={() => setContentSubTab(sub.id as any)} className={`px-8 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${contentSubTab === sub.id ? 'bg-white text-slate-900 shadow-lg scale-105' : 'text-slate-400 hover:text-slate-600'}`}>{sub.label}</button>
             ))}
           </div>
+
+          {contentSubTab === 'subjects' && (
+            <div className="space-y-6">
+              {subjects.map((subject) => (
+                <div key={subject.id} className="glass-effect p-8 rounded-[2rem] border shadow-sm border-white grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                  <input type="text" value={subject.name} onChange={e => setSubjects(prev => prev.map(s => s.id === subject.id ? {...s, name: e.target.value} : s))} className="p-3 rounded-xl border font-black uppercase" />
+                  <input type="text" value={subject.icon} onChange={e => setSubjects(prev => prev.map(s => s.id === subject.id ? {...s, icon: e.target.value} : s))} className="p-3 rounded-xl border text-center text-2xl" />
+                  <select value={subject.level} onChange={e => setSubjects(prev => prev.map(s => s.id === subject.id ? {...s, level: e.target.value as any} : s))} className="p-3 rounded-xl border font-black uppercase">
+                    {Object.values(SchoolLevel).map(level => <option key={level} value={level}>{level}</option>)}
+                  </select>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {contentSubTab === 'materials' && (
+            <div className="space-y-8">
+              {subjects.map((subject) => (
+                <div key={subject.id} className="glass-effect p-8 rounded-[2rem] border shadow-sm border-white">
+                  <h4 className="text-lg font-black text-slate-900 uppercase mb-4">{subject.name} - {subject.level}</h4>
+                  <div className="space-y-4">
+                    {subject.materials.map((material, idx) => (
+                      <div key={idx} className="flex gap-4 items-center bg-slate-50 p-4 rounded-xl">
+                        <input type="text" value={material.title} onChange={e => setSubjects(prev => prev.map(s => s.id === subject.id ? {...s, materials: s.materials.map((m, i) => i === idx ? {...m, title: e.target.value} : m)} : s))} className="flex-grow p-2 rounded-lg border" />
+                        <select value={material.type} onChange={e => setSubjects(prev => prev.map(s => s.id === subject.id ? {...s, materials: s.materials.map((m, i) => i === idx ? {...m, type: e.target.value as any} : m)} : s))} className="p-2 rounded-lg border">
+                          <option value="Note">Note</option>
+                          <option value="Video">Video</option>
+                          <option value="PDF">PDF</option>
+                        </select>
+                        <input type="text" value={material.url || ''} onChange={e => setSubjects(prev => prev.map(s => s.id === subject.id ? {...s, materials: s.materials.map((m, i) => i === idx ? {...m, url: e.target.value} : m)} : s))} className="flex-grow p-2 rounded-lg border" placeholder="URL" />
+                        <button onClick={() => setSubjects(prev => prev.map(s => s.id === subject.id ? {...s, materials: s.materials.filter((_, i) => i !== idx)} : s))} className="text-red-500 hover:text-red-700">Delete</button>
+                      </div>
+                    ))}
+                    <button onClick={() => setSubjects(prev => prev.map(s => s.id === subject.id ? {...s, materials: [...s.materials, { id: Date.now().toString(), title: 'New Material', type: 'Note', content: '' }]} : s))} className="text-xs font-black uppercase text-amber-600 hover:text-amber-700">+ Add Material</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {contentSubTab === 'testimonials' && (
+            <div className="space-y-6">
+              {testimonials.map((t) => (
+                <div key={t.id} className="glass-effect p-8 rounded-[2rem] border shadow-sm border-white flex gap-6">
+                  <img src={t.avatar} alt={t.name} className="w-20 h-20 rounded-full" />
+                  <div className="flex-grow">
+                    <input type="text" value={t.name} onChange={e => setTestimonials(prev => prev.map(item => item.id === t.id ? {...item, name: e.target.value} : item))} className="w-full font-black text-slate-900 uppercase tracking-tight mb-2 bg-transparent border-b border-slate-200" />
+                    <input type="text" value={t.role} onChange={e => setTestimonials(prev => prev.map(item => item.id === t.id ? {...item, role: e.target.value} : item))} className="w-full text-xs font-bold text-amber-600 uppercase tracking-widest mb-4 bg-transparent border-b border-slate-200" />
+                    <textarea value={t.content} onChange={e => setTestimonials(prev => prev.map(item => item.id === t.id ? {...item, content: e.target.value} : item))} className="w-full text-slate-600 font-medium leading-relaxed italic bg-transparent border-b border-slate-200" />
+                  </div>
+                  <button onClick={() => setTestimonials(prev => prev.filter(item => item.id !== t.id))} className="text-red-500 hover:text-red-700">Delete</button>
+                </div>
+              ))}
+            </div>
+          )}
 
           {contentSubTab === 'contact' && (
             <div className="space-y-6">
