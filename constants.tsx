@@ -1,5 +1,5 @@
 
-import { SchoolLevel, Subject, Question, SchoolConfig, Testimonial, Meeting, TaskType, LearningMaterial, LibraryResource } from './types';
+import { SchoolLevel, Subject, Question, SchoolConfig, Testimonial, Meeting, TaskType, LearningMaterial, LibraryResource, Curriculum } from './types';
 
 const generateMaterials = (subjectName: string, topics: string[]): LearningMaterial[] => {
   return topics.map((topic, index) => ({
@@ -61,51 +61,51 @@ const generateAcademicQuestions = (subjectName: string, level: SchoolLevel, coun
 export const SUBJECTS: Subject[] = [
   // NURSERY
   { 
-    id: 'n-lit', name: 'Literacy & Phonics', level: SchoolLevel.NURSERY, icon: '📚', 
+    id: 'n-lit', name: 'Literacy & Phonics', level: SchoolLevel.NURSERY, curriculum: Curriculum.BRITISH, icon: '📚', 
     questions: generateAcademicQuestions('Literacy', SchoolLevel.NURSERY, 15),
     homework: generateTaskQuestions('Literacy', TaskType.HOMEWORK, 5),
     tests: generateTaskQuestions('Literacy', TaskType.TEST, 10),
-    materials: generateMaterials('Literacy', ['The Alphabet Song', 'Vowel Sounds', 'Three Letter Words', 'Simple Sentences'])
+    materials: generateMaterials('Literacy', ['Jolly Phonics A-Z', 'Introduction to Reading', 'Vocabulary Building', 'British Tales'])
   },
   { 
-    id: 'n-num', name: 'Numeracy & Shapes', level: SchoolLevel.NURSERY, icon: '🔢', 
+    id: 'n-num', name: 'Numeracy & Shapes', level: SchoolLevel.NURSERY, curriculum: Curriculum.NIGERIAN, icon: '🔢', 
     questions: generateAcademicQuestions('Numeracy', SchoolLevel.NURSERY, 15),
     homework: generateTaskQuestions('Numeracy', TaskType.HOMEWORK, 5),
     tests: generateTaskQuestions('Numeracy', TaskType.TEST, 10),
-    materials: generateMaterials('Numeracy', ['Counting 1-20', 'Basic Addition', 'Identifying Circles & Squares', 'Number Rhymes'])
+    materials: generateMaterials('Numeracy', ['Counting Basics', 'Nigerian Number Rhymes', 'Basic Addition for Kids', 'Shape Identification'])
   },
   { 
-    id: 'n-cre', name: 'Creative Arts', level: SchoolLevel.NURSERY, icon: '🎨', 
+    id: 'n-cre', name: 'Creative Arts', level: SchoolLevel.NURSERY, curriculum: Curriculum.BRITISH, icon: '🎨', 
     questions: generateAcademicQuestions('Arts', SchoolLevel.NURSERY, 10),
     homework: generateTaskQuestions('Arts', TaskType.HOMEWORK, 3),
     tests: generateTaskQuestions('Arts', TaskType.TEST, 5),
-    materials: generateMaterials('Creative Arts', ['Primary Colors', 'Hand Painting', 'Paper Folding', 'Drawing My Family'])
+    materials: generateMaterials('Creative Arts', ['British Art Techniques', 'Painting Basics', 'Papercraft', 'Story Illustration'])
   },
 
   // GRADE
   { 
-    id: 'g-mat', name: 'Mathematics', level: SchoolLevel.GRADE, icon: '📐', 
+    id: 'g-mat', name: 'Mathematics', level: SchoolLevel.GRADE, curriculum: Curriculum.NIGERIAN, icon: '📐', 
     questions: generateAcademicQuestions('Mathematics', SchoolLevel.GRADE, 30),
     homework: generateTaskQuestions('Mathematics', TaskType.HOMEWORK, 10),
     tests: generateTaskQuestions('Mathematics', TaskType.TEST, 15),
-    materials: generateMaterials('Mathematics', ['Long Division', 'Fractions & Decimals', 'Introduction to Algebra', 'Measurement of Perimeter'])
+    materials: generateMaterials('Mathematics', ['Nursery Arithmetic', 'Nigerian Geometry', 'Fractions', 'Measurement'])
   },
   { 
-    id: 'g-eng', name: 'English Language', level: SchoolLevel.GRADE, icon: '📖', 
+    id: 'g-eng', name: 'English Language', level: SchoolLevel.GRADE, curriculum: Curriculum.BRITISH, icon: '📖', 
     questions: generateAcademicQuestions('English', SchoolLevel.GRADE, 30),
     homework: generateTaskQuestions('English', TaskType.HOMEWORK, 10),
     tests: generateTaskQuestions('English', TaskType.TEST, 15),
     materials: generateMaterials('English', ['Parts of Speech', 'Punctuation Rules', 'Letter Writing', 'Comprehension Skills'])
   },
   { 
-    id: 'g-sci', name: 'Basic Science', level: SchoolLevel.GRADE, icon: '🧪', 
+    id: 'g-sci', name: 'Basic Science', level: SchoolLevel.GRADE, curriculum: Curriculum.NIGERIAN, icon: '🧪', 
     questions: generateAcademicQuestions('Science', SchoolLevel.GRADE, 25),
     homework: generateTaskQuestions('Science', TaskType.HOMEWORK, 8),
     tests: generateTaskQuestions('Science', TaskType.TEST, 12),
     materials: generateMaterials('Basic Science', ['The Human Body', 'Living & Non-living Things', 'Energy Forms', 'Simple Machines'])
   },
   { 
-    id: 'g-soc', name: 'Social Studies', level: SchoolLevel.GRADE, icon: '🌍', 
+    id: 'g-soc', name: 'Social Studies', level: SchoolLevel.GRADE, curriculum: Curriculum.NIGERIAN, icon: '🌍', 
     questions: generateAcademicQuestions('Social Studies', SchoolLevel.GRADE, 20),
     homework: generateTaskQuestions('Social Studies', TaskType.HOMEWORK, 5),
     tests: generateTaskQuestions('Social Studies', TaskType.TEST, 10),
@@ -114,21 +114,21 @@ export const SUBJECTS: Subject[] = [
 
   // JUNIOR SECONDARY
   { 
-    id: 'j-mat', name: 'Mathematics', level: SchoolLevel.JUNIOR_SECONDARY, icon: '📊', 
+    id: 'j-mat', name: 'Mathematics', level: SchoolLevel.JUNIOR_SECONDARY, curriculum: Curriculum.NIGERIAN, icon: '📊', 
     questions: generateAcademicQuestions('Mathematics', SchoolLevel.JUNIOR_SECONDARY, 40),
     homework: generateTaskQuestions('Mathematics', TaskType.HOMEWORK, 15),
     tests: generateTaskQuestions('Mathematics', TaskType.TEST, 20),
     materials: generateMaterials('Mathematics', ['Linear Equations', 'Pythagoras Theorem', 'Probability Theory', 'Set Theory Fundamentals'])
   },
   { 
-    id: 'j-ict', name: 'Computer Science (ICT)', level: SchoolLevel.JUNIOR_SECONDARY, icon: '💻', 
+    id: 'j-ict', name: 'Computer Science (ICT)', level: SchoolLevel.JUNIOR_SECONDARY, curriculum: Curriculum.BRITISH, icon: '💻', 
     questions: generateAcademicQuestions('ICT', SchoolLevel.JUNIOR_SECONDARY, 30),
     homework: generateTaskQuestions('ICT', TaskType.HOMEWORK, 10),
     tests: generateTaskQuestions('ICT', TaskType.TEST, 15),
     materials: generateMaterials('ICT', ['Hardware vs Software', 'Operating Systems', 'Safe Internet Usage', 'Basic HTML/Coding'])
   },
   { 
-    id: 'j-bus', name: 'Business Studies', level: SchoolLevel.JUNIOR_SECONDARY, icon: '💹', 
+    id: 'j-bus', name: 'Business Studies', level: SchoolLevel.JUNIOR_SECONDARY, curriculum: Curriculum.NIGERIAN, icon: '💹', 
     questions: generateAcademicQuestions('Business', SchoolLevel.JUNIOR_SECONDARY, 30),
     homework: generateTaskQuestions('Business', TaskType.HOMEWORK, 10),
     tests: generateTaskQuestions('Business', TaskType.TEST, 15),
@@ -137,35 +137,35 @@ export const SUBJECTS: Subject[] = [
 
   // SENIOR SECONDARY
   { 
-    id: 's-mat', name: 'Mathematics', level: SchoolLevel.SENIOR_SECONDARY, icon: '📐', 
+    id: 's-mat', name: 'Mathematics', level: SchoolLevel.SENIOR_SECONDARY, curriculum: Curriculum.NIGERIAN, icon: '📐', 
     questions: generateAcademicQuestions('Mathematics', SchoolLevel.SENIOR_SECONDARY, 50),
     homework: generateTaskQuestions('Mathematics', TaskType.HOMEWORK, 20),
     tests: generateTaskQuestions('Mathematics', TaskType.TEST, 25),
     materials: generateMaterials('Mathematics', ['Calculus Basics', 'Trigonometry Identities', 'Statistics & Data Analysis', 'Coordinate Geometry'])
   },
   { 
-    id: 's-phy', name: 'Physics', level: SchoolLevel.SENIOR_SECONDARY, icon: '⚡', 
+    id: 's-phy', name: 'Physics', level: SchoolLevel.SENIOR_SECONDARY, curriculum: Curriculum.BRITISH, icon: '⚡', 
     questions: generateAcademicQuestions('Physics', SchoolLevel.SENIOR_SECONDARY, 40),
     homework: generateTaskQuestions('Physics', TaskType.HOMEWORK, 15),
     tests: generateTaskQuestions('Physics', TaskType.TEST, 20),
     materials: generateMaterials('Physics', ['Mechanics & Motion', 'Waves & Optics', 'Electricity & Magnetism', 'Atomic Physics'])
   },
   { 
-    id: 's-che', name: 'Chemistry', level: SchoolLevel.SENIOR_SECONDARY, icon: '🧪', 
+    id: 's-che', name: 'Chemistry', level: SchoolLevel.SENIOR_SECONDARY, curriculum: Curriculum.BRITISH, icon: '🧪', 
     questions: generateAcademicQuestions('Chemistry', SchoolLevel.SENIOR_SECONDARY, 40),
     homework: generateTaskQuestions('Chemistry', TaskType.HOMEWORK, 15),
     tests: generateTaskQuestions('Chemistry', TaskType.TEST, 20),
     materials: generateMaterials('Chemistry', ['Organic Chemistry', 'Chemical Bonding', 'Stoichiometry', 'Electrochemistry'])
   },
   { 
-    id: 's-bio', name: 'Biology', level: SchoolLevel.SENIOR_SECONDARY, icon: '🧬', 
+    id: 's-bio', name: 'Biology', level: SchoolLevel.SENIOR_SECONDARY, curriculum: Curriculum.NIGERIAN, icon: '🧬', 
     questions: generateAcademicQuestions('Biology', SchoolLevel.SENIOR_SECONDARY, 40),
     homework: generateTaskQuestions('Biology', TaskType.HOMEWORK, 15),
     tests: generateTaskQuestions('Biology', TaskType.TEST, 20),
     materials: generateMaterials('Biology', ['Cell Biology', 'Genetics & Evolution', 'Plant & Animal Physiology', 'Ecology'])
   },
   { 
-    id: 's-eng', name: 'English Language', level: SchoolLevel.SENIOR_SECONDARY, icon: '📝', 
+    id: 's-eng', name: 'English Language', level: SchoolLevel.SENIOR_SECONDARY, curriculum: Curriculum.BRITISH, icon: '📝', 
     questions: generateAcademicQuestions('English', SchoolLevel.SENIOR_SECONDARY, 40),
     homework: generateTaskQuestions('English', TaskType.HOMEWORK, 15),
     tests: generateTaskQuestions('English', TaskType.TEST, 20),

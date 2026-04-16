@@ -42,10 +42,16 @@ export interface Question {
   taskType?: TaskType;
 }
 
+export enum Curriculum {
+  BRITISH = 'British',
+  NIGERIAN = 'Nigerian'
+}
+
 export interface Subject {
   id: string;
   name: string;
   level: SchoolLevel;
+  curriculum: Curriculum;
   icon: string;
   questions: Question[]; // Default to Exam
   homework: Question[];

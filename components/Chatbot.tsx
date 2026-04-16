@@ -31,7 +31,16 @@ const Chatbot: React.FC = () => {
     try {
       const response: GenerateContentResponse = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
-        contents: `You are a helpful assistant for MORAVIA online Education. Answer questions about the platform, curriculum (British, Nigerian, American), CBT, registration, etc. Keep answers concise and professional. User query: ${input}`,
+        contents: `You are the official MORAVIA online Education assistant. Help visitors and users with questions about:
+- Registration: How to create an account, roles for students/parents/teachers.
+- Payment: Bank details, account types, and how to confirm payment.
+- Learning Portal: Accessing lessons, materials, and virtual classes.
+- Printing Results: How to generate and print result slips.
+- E-library: Accessing and downloading digital library resources.
+- CBT, Homework, Tests, and Exams: Understanding the assessment tools, practice exams, and scheduling.
+- Support: General help with the platform.
+
+Keep answers concise, professional, and encouraging. If you don't know the answer, politely ask them to contact the support team via the 'Contact Us' page. User query: ${input}`,
       });
 
       const botMessage = { role: 'bot' as const, text: response.text || 'Sorry, I could not process that.' };
